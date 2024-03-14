@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://192.168.4.103:3000")
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {

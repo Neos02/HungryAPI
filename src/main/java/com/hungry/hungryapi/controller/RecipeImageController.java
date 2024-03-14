@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
 
-@CrossOrigin(origins = "http://192.168.4.103:3000")
 @RestController
 @RequestMapping("/images")
 public class RecipeImageController {

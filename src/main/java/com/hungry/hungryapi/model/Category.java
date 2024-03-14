@@ -1,11 +1,8 @@
 package com.hungry.hungryapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
