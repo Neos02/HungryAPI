@@ -53,18 +53,36 @@ public class RecipeImageController {
 
     @PostMapping("/{id}")
     public ResponseEntity<RecipeImage> uploadImage(@PathVariable("id") long recipeId, @RequestParam("image") MultipartFile file) {
+        String outputType = "png";
+
         try {
-            Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+            Optional<RecipeImage> recipeImage = recipeImageRepository.findById(recipeId);
 
-            if(recipe.isPresent()) {
-                Recipe updatedRecipe = recipe.get();
-                RecipeImage recipeImage = new RecipeImage(updatedRecipe, file.getContentType(), ImageUtility.compressImage(file.getBytes()));
+            if(recipeImage.isPresent()) {
+                RecipeImage updatedRecipeImage = recipeImage.get();
 
-                updatedRecipe.setImage(recipeImage);
+                updatedRecipeImage.setType("image/%s".formatted(outputType));
+                updatedRecipeImage.setData(ImageUtility.compressImage(ImageUtility.convertImage(file.getBytes(), outputType)));
 
-                recipeRepository.save(updatedRecipe);
+                recipeImageRepository.save(updatedRecipeImage);
 
-                return new ResponseEntity<>(recipeImage, HttpStatus.OK);
+                return new ResponseEntity<>(updatedRecipeImage, HttpStatus.OK);
+            } else {
+                Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+
+                if (recipe.isPresent()) {
+                    Recipe updatedRecipe = recipe.get();
+                    RecipeImage newRecipeImage = new RecipeImage(
+                            updatedRecipe,
+                            "image/%s".formatted(outputType),
+                            ImageUtility.compressImage(ImageUtility.convertImage(file.getBytes(), outputType)));
+
+                    updatedRecipe.setImage(newRecipeImage);
+
+                    recipeRepository.save(updatedRecipe);
+
+                    return new ResponseEntity<>(newRecipeImage, HttpStatus.OK);
+                }
             }
 
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

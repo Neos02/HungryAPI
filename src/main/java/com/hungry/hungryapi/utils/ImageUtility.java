@@ -1,5 +1,8 @@
 package com.hungry.hungryapi.utils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -46,6 +49,16 @@ public class ImageUtility {
         }
 
         outputStream.close();
+
+        return outputStream.toByteArray();
+    }
+
+    public static byte[] convertImage(byte[] data, String formatName) throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        BufferedImage bufferedImage = ImageIO.read(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, formatName, outputStream);
 
         return outputStream.toByteArray();
     }
