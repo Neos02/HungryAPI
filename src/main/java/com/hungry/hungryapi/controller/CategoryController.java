@@ -16,7 +16,7 @@ import java.util.Optional;
 public class CategoryController {
 
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {

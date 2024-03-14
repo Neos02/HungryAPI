@@ -1,8 +1,10 @@
 package com.hungry.hungryapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,8 +27,10 @@ public class Recipe {
     @Column(name = "views")
     private int views;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @OneToOne(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    @JsonIgnore
+    private RecipeImage image;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinTable(
@@ -39,12 +43,13 @@ public class Recipe {
 
     public Recipe() {}
 
-    public Recipe(String name, String description, int cookTimeMinutes, String imageUrl) {
+    public Recipe(String name, String description, int cookTimeMinutes) {
         this.name = name;
         this.description = description;
         this.cookTimeMinutes = cookTimeMinutes;
         this.views = 0;
-        this.imageUrl = imageUrl;
+        this.image = null;
+        this.categories = new HashSet<>();
     }
 
     public long getId() {
@@ -83,12 +88,12 @@ public class Recipe {
         this.views = views;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public RecipeImage getImage() {
+        return image;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImage(RecipeImage image) {
+        this.image = image;
     }
 
     public Set<Category> getCategories() {
@@ -107,8 +112,6 @@ public class Recipe {
                 ", description='" + description + '\'' +
                 ", cookTimeMinutes=" + cookTimeMinutes +
                 ", views=" + views +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", categories=" + categories +
                 '}';
     }
 }

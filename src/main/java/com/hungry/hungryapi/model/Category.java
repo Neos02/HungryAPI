@@ -3,8 +3,10 @@ package com.hungry.hungryapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "categories")
@@ -19,7 +21,7 @@ public class Category {
 
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JsonIgnoreProperties(value = "categories")
-    private List<Recipe> recipes;
+    private Set<Recipe> recipes;
 
     public Category() {}
 
@@ -39,11 +41,11 @@ public class Category {
         this.name = name;
     }
 
-    public List<Recipe> getRecipes() {
+    public Set<Recipe> getRecipes() {
         return recipes;
     }
 
-    public void setRecipes(List<Recipe> recipes) {
+    public void setRecipes(Set<Recipe> recipes) {
         this.recipes = recipes;
     }
 
@@ -52,7 +54,6 @@ public class Category {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", recipes=" + recipes +
                 '}';
     }
 }

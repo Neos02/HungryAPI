@@ -16,7 +16,7 @@ import java.util.Optional;
 public class RecipeController {
 
     @Autowired
-    RecipeRepository recipeRepository;
+    private RecipeRepository recipeRepository;
 
     @GetMapping
     public ResponseEntity<List<Recipe>> getAllRecipes() {
@@ -45,9 +45,11 @@ public class RecipeController {
     public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
         try {
             Recipe newRecipe = recipeRepository
-                    .save(new Recipe(recipe.getName(), recipe.getDescription(), recipe.getCookTimeMinutes(), recipe.getImageUrl()));
+                    .save(new Recipe(recipe.getName(), recipe.getDescription(), recipe.getCookTimeMinutes()));
 
-            return new ResponseEntity<>(newRecipe, HttpStatus.CREATED);
+            newRecipe.setCategories(recipe.getCategories());
+
+            return new ResponseEntity<>(recipeRepository.save(newRecipe), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
