@@ -1,85 +1,69 @@
 package com.hungry.hungryapi.controller;
 
 import com.hungry.hungryapi.model.Recipe;
-import com.hungry.hungryapi.repository.RecipeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hungry.hungryapi.service.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {
 
-    @Autowired
-    private RecipeRepository recipeRepository;
+    private final RecipeService recipeService;
+
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Recipe>> getAllRecipes() {
-        try {
-            List<Recipe> recipes = recipeRepository.findAll();
+        List<Recipe> recipes = recipeService.getAllRecipes();
 
-            if (recipes.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            return new ResponseEntity<>(recipes, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (recipes.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") long id) {
-        Optional<Recipe> recipeData = recipeRepository.findById(id);
+    public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") Long id) {
+        Recipe recipe = recipeService.getRecipeById(id);
 
-        return recipeData.map(recipe -> new ResponseEntity<>(recipe, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if(recipe == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
-        try {
-            Recipe newRecipe = recipeRepository
-                    .save(new Recipe(recipe.getName(), recipe.getDescription(), recipe.getCookTimeMinutes()));
+        Recipe newRecipe = recipeService.createRecipe(recipe);
 
-            newRecipe.setCategories(recipe.getCategories());
-
-            return new ResponseEntity<>(recipeRepository.save(newRecipe), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(newRecipe, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Recipe> updateRecipe(@PathVariable("id") long id, @RequestBody Recipe recipe) {
-        Optional<Recipe> recipeData = recipeRepository.findById(id);
+        Recipe updatedRecipe = recipeService.updateRecipe(id, recipe);
 
-        if(recipeData.isPresent()) {
-            Recipe updatedRecipe = recipeData.get();
-
-            updatedRecipe.setName(recipe.getName());
-            updatedRecipe.setDescription(recipe.getDescription());
-            updatedRecipe.setCookTimeMinutes(recipe.getCookTimeMinutes());
-            updatedRecipe.setCategories(recipe.getCategories());
-
-            return new ResponseEntity<>(recipeRepository.save(updatedRecipe), HttpStatus.OK);
+        if(updatedRecipe == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(updatedRecipe, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteRecipe(@PathVariable("id") long id) {
-        try {
-            recipeRepository.deleteById(id);
-
+    public ResponseEntity<HttpStatus> deleteRecipe(@PathVariable("id") Long id) {
+        if(recipeService.deleteRecipe(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

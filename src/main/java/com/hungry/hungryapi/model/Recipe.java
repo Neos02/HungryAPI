@@ -3,6 +3,7 @@ package com.hungry.hungryapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.springframework.lang.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,19 +14,22 @@ public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
+    @NonNull
     @Column(name = "name", columnDefinition = "TEXT")
     private String name;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @NonNull
     @Column(name = "cook_time_minutes")
-    private int cookTimeMinutes;
+    private Integer cookTimeMinutes;
 
+    @NonNull
     @Column(name = "views")
-    private int views;
+    private Integer views;
 
     @OneToOne(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -43,7 +47,7 @@ public class Recipe {
 
     public Recipe() {}
 
-    public Recipe(String name, String description, int cookTimeMinutes) {
+    public Recipe(@NonNull String name, String description, @NonNull Integer cookTimeMinutes) {
         this.name = name;
         this.description = description;
         this.cookTimeMinutes = cookTimeMinutes;
@@ -52,15 +56,30 @@ public class Recipe {
         this.categories = new HashSet<>();
     }
 
-    public long getId() {
+    public Recipe(Long id, @NonNull String name, String description, @NonNull Integer cookTimeMinutes, @NonNull Integer views) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.cookTimeMinutes = cookTimeMinutes;
+        this.views = 0;
+        this.image = null;
+        this.categories = new HashSet<>();
+    }
+
+    public Long getId() {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @NonNull
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
@@ -72,19 +91,21 @@ public class Recipe {
         this.description = description;
     }
 
-    public int getCookTimeMinutes() {
+    @NonNull
+    public Integer getCookTimeMinutes() {
         return cookTimeMinutes;
     }
 
-    public void setCookTimeMinutes(int cookTimeMinutes) {
+    public void setCookTimeMinutes(@NonNull Integer cookTimeMinutes) {
         this.cookTimeMinutes = cookTimeMinutes;
     }
 
-    public int getViews() {
+    @NonNull
+    public Integer getViews() {
         return views;
     }
 
-    public void setViews(int views) {
+    public void setViews(@NonNull Integer views) {
         this.views = views;
     }
 
