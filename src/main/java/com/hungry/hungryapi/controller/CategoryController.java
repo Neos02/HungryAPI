@@ -1,69 +1,63 @@
 package com.hungry.hungryapi.controller;
 
 import com.hungry.hungryapi.model.Category;
-import com.hungry.hungryapi.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hungry.hungryapi.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
-        try {
-            List<Category> categories = categoryRepository.findAll();
-
-            if(categories.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            return new ResponseEntity<>(categories, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(categoryService.getAllCategories(), HttpStatus.OK);
     }
 
     @GetMapping(params = "name")
     public ResponseEntity<Category> getCategoryByName(@RequestParam(name = "name") String name) {
-        try {
-            Optional<Category> categoryData = categoryRepository.findByName(name);
+        Category category = categoryService.getCategoryByName(name);
 
-            return categoryData.map(category -> new ResponseEntity<>(category, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        if(category == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        try {
-            Category newCategory = categoryRepository
-                    .save(new Category(category.getName()));
+        Category newCategory = categoryService.createCategory(category);
 
-            return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") Long id, @RequestBody Category category) {
+        Category updatedCategory = categoryService.updateCategory(id, category);
+
+        if(updatedCategory == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCategory(@PathVariable("id") long id) {
-        try {
-            categoryRepository.deleteById(id);
-
+    public ResponseEntity<HttpStatus> deleteCategory(@PathVariable("id") Long id) {
+        if(categoryService.deleteCategoryById(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

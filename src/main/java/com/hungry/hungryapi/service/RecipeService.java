@@ -53,7 +53,7 @@ public class RecipeService {
         return recipeRepository.save(updatedRecipe);
     }
 
-    public boolean deleteRecipe(Long id) {
+    public boolean deleteRecipeById(Long id) {
         Optional<Recipe> recipe = recipeRepository.findById(id);
 
         if(recipe.isEmpty()) {

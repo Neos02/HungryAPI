@@ -20,13 +20,7 @@ public class RecipeController {
 
     @GetMapping
     public ResponseEntity<List<Recipe>> getAllRecipes() {
-        List<Recipe> recipes = recipeService.getAllRecipes();
-
-        if (recipes.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<>(recipes, HttpStatus.OK);
+        return new ResponseEntity<>(recipeService.getAllRecipes(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -48,7 +42,7 @@ public class RecipeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Recipe> updateRecipe(@PathVariable("id") long id, @RequestBody Recipe recipe) {
+    public ResponseEntity<Recipe> updateRecipe(@PathVariable("id") Long id, @RequestBody Recipe recipe) {
         Recipe updatedRecipe = recipeService.updateRecipe(id, recipe);
 
         if(updatedRecipe == null) {
@@ -60,7 +54,7 @@ public class RecipeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteRecipe(@PathVariable("id") Long id) {
-        if(recipeService.deleteRecipe(id)) {
+        if(recipeService.deleteRecipeById(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

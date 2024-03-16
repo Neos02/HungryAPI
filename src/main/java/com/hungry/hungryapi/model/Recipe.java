@@ -2,7 +2,19 @@ package com.hungry.hungryapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 import org.springframework.lang.NonNull;
 
 import java.util.HashSet;
@@ -57,13 +69,10 @@ public class Recipe {
     }
 
     public Recipe(Long id, @NonNull String name, String description, @NonNull Integer cookTimeMinutes, @NonNull Integer views) {
+        this(name, description, cookTimeMinutes);
+
         this.id = id;
-        this.name = name;
-        this.description = description;
-        this.cookTimeMinutes = cookTimeMinutes;
-        this.views = 0;
-        this.image = null;
-        this.categories = new HashSet<>();
+        this.views = views;
     }
 
     public Long getId() {
